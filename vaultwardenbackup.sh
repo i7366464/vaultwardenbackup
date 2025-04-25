@@ -17,15 +17,17 @@ tar -czf "$ARCHIVE_NAME" -C "$(dirname "$SOURCE_DIR")" "$(basename "$SOURCE_DIR"
 # 3. 移动压缩包到目标目录
 mv "$ARCHIVE_NAME" "$DEST_DIR"
 
-# 4. 查找并删除 7 天前的旧备份
+# 4. 查找并删除 7 天前的旧备份（更安全方式）
 OLD_BACKUPS=$(find "$DEST_DIR" -type f -name "*.tar.gz" -mtime +7)
 
 if [ -n "$OLD_BACKUPS" ]; then
-    echo "$OLD_BACKUPS" | xargs rm -f
+    echo "$OLD_BACKUPS" | while IFS= read -r file; do
+        rm -f "$file"
+    done
     echo "🧹 已清理 7 天前的旧备份文件"
 else
     echo "📁 还没有 7 天前的旧备份文件，无需清理"
 fi
 
-# 5. 最后输出压缩结果
-echo "✅ 压缩完成：$ARCHIVE_NAME"
+# 5. 输出压缩结果
+echo "✅ 压缩完成：$DEST_DIR/$ARCHIVE_NAME"
